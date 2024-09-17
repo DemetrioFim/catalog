@@ -1,0 +1,199 @@
+<!-- ecommerce_catalog/products/templates/products/lista_cestas.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Gerenciamento de Cestas</h1>
+
+    <!-- Formulário de Filtros -->
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="cliente">Filtrar por Cliente</label>
+                <select name="cliente" class="form-control" id="cliente">
+                    <option value="">Todos os Clientes</option>
+                    {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}" {% if request.GET.cliente == cliente.id|stringformat:"s" %}selected{% endif %}>{{ cliente.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label for="status">Filtrar por Status</label>
+                <select name="status" class="form-control" id="status">
+                    <option value="">Todos os Status</option>
+                    {% for status_value, status_name in status_opcoes %}
+                        <option value="{{ status_value }}" {% if request.GET.status == status_value|stringformat:"s" %}selected{% endif %}>{{ status_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Lista de Cestas -->
+    <ul class="nav nav-tabs" id="cestaTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="lista-tab" data-toggle="tab" href="#lista" role="tab" aria-controls="lista" aria-selected="true">Lista de Cestas</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="criar-tab" data-toggle="tab" href="#criar" role="tab" aria-controls="criar" aria-selected="false">Criar Cesta</a>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3" id="cestaTabContent">
+        <!-- Sub-tab de Lista de Cestas -->
+        <div class="tab-pane fade show active" id="lista" role="tabpanel" aria-labelledby="lista-tab">
+            <div class="list-group">
+                {% for cesta in cestas %}
+                    <div class="list-group-item">
+                        <h5 class="mb-1">
+                            Cesta {{ cesta.id }} - Cliente: {{ cesta.cliente.nome }} - Status: <strong>{{ cesta.get_status_display }}</strong>
+                        </h5>
+                        <ul>
+                            {% for item in cesta.itemcesta_set.all %}
+                                <li>
+                                    {{ item.quantidade }}x {{ item.produto.nome }} 
+                                    - R$ {{ item.produto.preco }} cada
+                                    - Total: R$ {{ item.preco_total }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <strong>Preço Total da Cesta: R$ {{ cesta.preco_total }}</strong>
+                        <h5 class="mb-1">
+                            <a href="{% url 'editar_cesta' cesta.id %}" class="btn btn-primary btn-sm float-right">Editar</a>
+                            <button class="btn btn-danger btn-sm float-right mr-2" onclick="confirmarExclusao('{{ cesta.id }}', '{{ cesta.cliente.nome }}')">Excluir</button>
+                        </h5>
+
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Sub-tab de Criação de Cestas -->
+        <div class="tab-pane fade" id="criar" role="tabpanel" aria-labelledby="criar-tab">
+            <div class="card card-body">
+                <h2>Criar Nova Cesta</h2>
+                <form method="post" id="cestaForm">
+                    {% csrf_token %}
+                    {{ form.cliente.label_tag }} {{ form.cliente }}
+                    <br>
+                    {{ form.status.label_tag }} {{ form.status }}
+
+                    <h3>Adicionar Produtos à Cesta</h3>
+                    <div id="produtoContainer">
+                        <div class="produto-item mb-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="produto_0">Produto</label>
+                                    <select name="produto_0" class="form-control produto-select">
+                                        {% for produto in form.fields.produtos.queryset %}
+                                            <option value="{{ produto.id }}" data-preco="{{ produto.preco|floatformat:2 }}">
+
+                                                {{ produto.nome }} - R$ {{ produto.preco }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="quantidade_0">Quantidade</label>
+                                    <input type="number" name="quantidade_0" min="1" value="1" class="form-control quantidade-input">
+                                </div>
+                                <div class="col-md-3">
+                                    <p class="mt-4 total-item">Total: R$ {{ produto.preco }}</p>
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <button type="button" class="btn btn-danger remove-produto">Remover</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="adicionarProdutoBtn" class="btn btn-secondary">Adicionar Produto</button>
+                    <button type="submit" class="btn btn-success mt-3">Salvar Cesta</button>
+                    <a href="{% url 'lista_cestas' %}" class="btn btn-danger mt-3">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const produtoContainer = document.getElementById('produtoContainer');
+    const adicionarProdutoBtn = document.getElementById('adicionarProdutoBtn');
+    const totalCestaElement = document.createElement('p');
+    totalCestaElement.className = 'mt-3';
+    produtoContainer.parentNode.appendChild(totalCestaElement);
+
+    function atualizarTotalCesta() {
+        let totalCesta = 0;
+        produtoContainer.querySelectorAll('.produto-item').forEach(function(item) {
+            const quantidade = parseFloat(item.querySelector('.quantidade-input').value);
+            const preco = parseFloat(item.querySelector('.produto-select option:checked').dataset.preco);
+            
+            if (!isNaN(quantidade) && !isNaN(preco)) {
+                const totalItem = quantidade * preco;
+                item.querySelector('.total-item').innerText = `Total: R$ ${totalItem.toFixed(2)}`;
+                totalCesta += totalItem;
+            }
+        });
+        totalCestaElement.innerText = `Preço Total da Cesta: R$ ${totalCesta.toFixed(2)}`;
+    }
+
+    produtoContainer.addEventListener('input', function(e) {
+        if (e.target.classList.contains('quantidade-input') || e.target.classList.contains('produto-select')) {
+            atualizarTotalCesta();
+        }
+    });
+
+    adicionarProdutoBtn.addEventListener('click', function() {
+        const newProdutoItem = produtoContainer.children[0].cloneNode(true);
+        const totalItems = produtoContainer.children.length;
+
+        newProdutoItem.querySelectorAll('input, select').forEach(function(element) {
+            if (element.name.startsWith('produto_')) {
+                element.name = `produto_${totalItems}`;
+                element.id = `produto_${totalItems}`;
+            }
+            if (element.name.startsWith('quantidade_')) {
+                element.name = `quantidade_${totalItems}`;
+                element.id = `quantidade_${totalItems}`;
+                element.value = 1;
+            }
+        });
+        newProdutoItem.querySelector('.total-item').innerText = 'Total: R$ 0.00';
+        produtoContainer.appendChild(newProdutoItem);
+        addRemoveEvent(newProdutoItem);
+        atualizarTotalCesta();
+    });
+
+    function addRemoveEvent(produtoItem) {
+        const removeBtn = produtoItem.querySelector('.remove-produto');
+        removeBtn.addEventListener('click', function() {
+            produtoItem.remove();
+            atualizarTotalCesta();
+        });
+    };
+
+    window.confirmarExclusao = function(cestaId, clienteNome) {
+        const confirmacao = confirm(`Você está prestes a excluir a cesta de ID ${cestaId} associada ao cliente ${clienteNome}. Deseja continuar?`);
+        if (confirmacao) {
+            window.location.href = `/cesta/${cestaId}/excluir/`;
+        }
+    }
+
+
+    // Inicializa o evento de remoção para o primeiro item
+    addRemoveEvent(produtoContainer.children[0]);
+
+    // Atualiza o total da cesta na carga inicial
+    atualizarTotalCesta();
+});
+</script>
+{% endblock %}

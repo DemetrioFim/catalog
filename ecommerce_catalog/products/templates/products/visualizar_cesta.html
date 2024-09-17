@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Cesta de Compras</h1>
+    {% if itens_cesta %}
+        <ul class="list-group">
+            {% for item in itens_cesta %}
+                <li class="list-group-item">
+                    {{ item.produto.nome }} - R$ {{ item.produto.preco }} x {{ item.quantidade }}
+                    <form method="post" action="{% url 'atualizar_item_cesta' item.id %}">
+                        {% csrf_token %}
+                        <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1">
+                        <button type="submit" class="btn btn-sm btn-success">Atualizar</button>
+                    </form>
+                    <a href="{% url 'remover_item_cesta' item.id %}" class="btn btn-sm btn-danger">Remover</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="#" class="btn btn-primary mt-3">Finalizar Compra</a>
+    {% else %}
+        <p>Sua cesta está vazia.</p>
+    {% endif %}
+</div>
+{% endblock %}

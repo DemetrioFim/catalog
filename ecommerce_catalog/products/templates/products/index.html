@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4" style="font-size: 2.5rem;">Bem-vindo ao Sistema de Gerenciamento!</h1>
+    <p class="lead" style="font-size: 1.2rem;">Aqui você pode gerenciar produtos, cestas, clientes e categorias de forma simples e eficiente.</p>
+    <hr class="my-4">
+    <p>Use as opções abaixo para navegar pelo sistema e gerenciar seus dados:</p>
+</div>
+
+<div class="container">
+    <div class="row text-center">
+
+        <!-- Card Cestas -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Cestas</h5>
+                    <p class="card-text">Crie e gerencie cestas de compras para seus clientes.</p>
+                    <a href="{% url 'lista_cestas' %}" class="btn btn-primary">Gerenciar Cestas</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Clientes -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Clientes</h5>
+                    <p class="card-text">Gerencie os dados de seus clientes de forma simples.</p>
+                    <a href="{% url 'lista_clientes' %}" class="btn btn-primary">Gerenciar Clientes</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Produtos -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Produtos</h5>
+                    <p class="card-text">Visualize, adicione, edite ou exclua seus produtos.</p>
+                    <a href="{% url 'lista_produtos' %}" class="btn btn-primary">Gerenciar Produtos</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Categorias -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Categorias</h5>
+                    <p class="card-text">Organize seus produtos em categorias para facilitar a gestão.</p>
+                    <a href="{% url 'lista_categorias' %}" class="btn btn-primary">Gerenciar Categorias</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .jumbotron h1 {
+        font-size: 2rem; /* Reduzindo o tamanho do título para melhor ajuste */
+    }
+    .jumbotron p.lead {
+        font-size: 1.2rem; /* Ajustando o tamanho do texto para responsividade */
+    }
+
+    @media (max-width: 768px) {
+        .jumbotron h1 {
+            font-size: 1.5rem; /* Reduz ainda mais o título em telas pequenas */
+        }
+        .jumbotron p.lead {
+            font-size: 1rem; /* Ajuste de fonte em telas menores */
+        }
+    }
+</style>
+{% endblock %}

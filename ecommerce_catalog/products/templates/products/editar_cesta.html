@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card card-body">
+    <h2>Editar Cesta</h2>
+    <form method="post" id="cestaForm">
+        {% csrf_token %}
+        {{ form.cliente.label_tag }} {{ form.cliente }}
+        <br>
+        {{ form.status.label_tag }} {{ form.status }}
+
+        <h3>Editar Produtos à Cesta</h3>
+        <div id="produtoContainer">
+            {% for item in cesta.itemcesta_set.all %}
+                <div class="produto-item mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="produto_{{ forloop.counter0 }}">Produto</label>
+                            <select name="produto_{{ forloop.counter0 }}" class="form-control produto-select">
+                                {% for produto in form.fields.produtos.queryset %}
+                                    <option value="{{ produto.id }}" data-preco="{{ produto.preco }}" {% if produto.id == item.produto.id %}selected{% endif %}>
+                                        {{ produto.nome }} - R$ {{ produto.preco }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="quantidade_{{ forloop.counter0 }}">Quantidade</label>
+                            <input type="number" name="quantidade_{{ forloop.counter0 }}" min="1" value="{{ item.quantidade }}" class="form-control quantidade-input">
+                        </div>
+                        <div class="col-md-3">
+                            <p class="mt-4 total-item">Total: R$ {{ item.preco_total }}</p>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger remove-produto">Remover</button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" id="adicionarProdutoBtn" class="btn btn-secondary">Adicionar Produto</button>
+        <p id="totalCesta" class="mt-3">Preço Total da Cesta: R$ 0.00</p>
+        <button type="submit" class="btn btn-success mt-3">Salvar Alterações</button>
+        <a href="{% url 'lista_cestas' %}" class="btn btn-danger mt-3">Cancelar</a>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const produtoContainer = document.getElementById('produtoContainer');
+    const adicionarProdutoBtn = document.getElementById('adicionarProdutoBtn');
+    const totalCestaElement = document.getElementById('totalCesta');
+
+    function atualizarTotalCesta() {
+        let totalCesta = 0;
+        produtoContainer.querySelectorAll('.produto-item').forEach(function(item) {
+            const quantidade = item.querySelector('.quantidade-input').value;
+            const preco = item.querySelector('.produto-select option:checked').dataset.preco;
+            const totalItem = quantidade * preco;
+            item.querySelector('.total-item').innerText = `Total: R$ ${totalItem.toFixed(2)}`;
+            totalCesta += parseFloat(totalItem);
+        });
+        totalCestaElement.innerText = `Preço Total da Cesta: R$ ${totalCesta.toFixed(2)}`;
+    }
+
+    produtoContainer.addEventListener('input', function(e) {
+        if (e.target.classList.contains('quantidade-input') || e.target.classList.contains('produto-select')) {
+            atualizarTotalCesta();
+        }
+    });
+
+    adicionarProdutoBtn.addEventListener('click', function() {
+        const newProdutoItem = produtoContainer.children[0].cloneNode(true);
+        const totalItems = produtoContainer.children.length;
+
+        newProdutoItem.querySelectorAll('input, select').forEach(function(element) {
+            if (element.name.startsWith('produto_')) {
+                element.name = `produto_${totalItems}`;
+                element.id = `produto_${totalItems}`;
+            }
+            if (element.name.startsWith('quantidade_')) {
+                element.name = `quantidade_${totalItems}`;
+                element.id = `quantidade_${totalItems}`;
+                element.value = 1;
+            }
+        });
+        newProdutoItem.querySelector('.total-item').innerText = 'Total: R$ 0.00';
+        produtoContainer.appendChild(newProdutoItem);
+        addRemoveEvent(newProdutoItem);
+        atualizarTotalCesta();
+    });
+
+    function addRemoveEvent(produtoItem) {
+        const removeBtn = produtoItem.querySelector('.remove-produto');
+        removeBtn.addEventListener('click', function() {
+            produtoItem.remove();
+            atualizarTotalCesta();
+        });
+    }
+
+    // Inicializa o evento de remoção para o primeiro item
+    addRemoveEvent(produtoContainer.children[0]);
+
+    // Atualiza o total da cesta na carga inicial
+    atualizarTotalCesta();
+});
+</script>
+{% endblock %}
