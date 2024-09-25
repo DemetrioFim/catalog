@@ -5,9 +5,9 @@ from .models import Produto, Cesta, ItemCesta, ItemCesta, Cliente, Categoria
 from .forms import ProdutoForm, ClienteForm, CategoriaForm, CestaComItensForm
 
 
-
 def index(request):
     return render(request, 'products/index.html')
+
 
 def lista_categorias(request):
     categorias = Categoria.objects.all()
@@ -23,6 +23,7 @@ def lista_categorias(request):
         'form': form
     })
 
+
 def lista_produtos(request):
     produtos = Produto.objects.all()
     form = ProdutoForm()
@@ -36,6 +37,7 @@ def lista_produtos(request):
         'produtos': produtos,
         'form': form
     })
+
 
 def lista_clientes(request):
     clientes = Cliente.objects.all()
@@ -62,6 +64,7 @@ def atualizar_item_cesta(request, item_id):
             item.save()
     return redirect('visualizar_cesta')
 
+
 def adicionar_a_cesta(request, produto_id):
     produto = get_object_or_404(Produto, id=produto_id)
     cesta_id = request.session.get('cesta_id')
@@ -78,6 +81,7 @@ def adicionar_a_cesta(request, produto_id):
 
     return redirect('lista_produtos')
 
+
 def remover_item_cesta(request, produto_id):
     cesta_id = request.session.get('cesta_id')
     if not cesta_id:
@@ -93,6 +97,7 @@ def remover_item_cesta(request, produto_id):
 
     return redirect('lista_produtos')
 
+
 def cadastrar_produto(request):
     if request.method == 'POST':
         form = ProdutoForm(request.POST, request.FILES)
@@ -103,6 +108,7 @@ def cadastrar_produto(request):
         form = ProdutoForm()
     
     return render(request, 'products/cadastrar_produto.html', {'form': form})
+
 
 def lista_cestas(request):
     # Ordena as cestas do maior para o menor pelo ID (ou use '-criado_em' para ordenar pela data de criação)
@@ -163,6 +169,7 @@ def lista_cestas(request):
     })
 
 
+
 def editar_cesta(request, cesta_id=None):
     if cesta_id:
         cesta = get_object_or_404(Cesta, id=cesta_id)
@@ -217,8 +224,10 @@ def editar_cesta(request, cesta_id=None):
         'cesta': cesta,
     })
 
+
 def cancelar_cesta(request):
     return redirect('lista_cestas')
+
 
 def excluir_cesta(request, cesta_id):
     cesta = get_object_or_404(Cesta, id=cesta_id)
@@ -227,6 +236,7 @@ def excluir_cesta(request, cesta_id):
 
 
 # Editar Produto
+
 def editar_produto(request, produto_id):
     produto = get_object_or_404(Produto, id=produto_id)
     if request.method == 'POST':
@@ -239,6 +249,7 @@ def editar_produto(request, produto_id):
     return render(request, 'products/editar_produto.html', {'form': form})
 
 # Editar Cliente
+
 def editar_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
     if request.method == 'POST':
@@ -251,6 +262,7 @@ def editar_cliente(request, cliente_id):
     return render(request, 'products/editar_cliente.html', {'form': form})
 
 # Editar Categoria
+
 def editar_categoria(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
     if request.method == 'POST':
@@ -263,19 +275,44 @@ def editar_categoria(request, categoria_id):
     return render(request, 'products/editar_categoria.html', {'form': form})
 
 # Excluir Produto
+
 def excluir_produto(request, produto_id):
     produto = get_object_or_404(Produto, id=produto_id)
     produto.delete()
     return redirect('lista_produtos')
 
 # Excluir Cliente
+
 def excluir_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, id=cliente_id)
     cliente.delete()
     return redirect('lista_clientes')
 
 # Excluir Categoria
+
 def excluir_categoria(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
     categoria.delete()
     return redirect('lista_categorias')
+
+def atualizar_preco_produto(request, produto_id):
+    produto = get_object_or_404(Produto, id=produto_id)
+    if request.method == 'POST':
+        form = ProductPriceForm(request.POST)
+        if form.is_valid():
+            product_price = form.save(commit=False)
+            product_price.produto = produto
+            product_price.save()  # O sinal cuidará de atualizar o current_price e data_fim
+            return redirect('lista_produtos')
+    else:
+        form = ProductPriceForm()
+    
+    return render(request, 'products/atualizar_preco_produto.html', {
+        'form': form,
+        'produto': produto,
+    })
+
+
+def lista_produtos(request):
+    produtos = Produto.objects.all().select_related('categoria')
+    return render(request, 'products/lista_produtos.html', {'produtos': produtos})

@@ -5,5 +5,6 @@ from django.urls import path, include  # Inclua o include para adicionar as URLs
 
 urlpatterns = [
     path('admin/', admin.site.urls),  # URL padrão do admin
+    path('accounts/', include('django.contrib.auth.urls')),
     path('', include('products.urls')),  # Inclua as URLs do app 'products'
 ]

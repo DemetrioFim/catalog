@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-si3n3$x2#f4pl90!4iqf-r+t_l!6h7hd#s+ri@jbvk-vzno(n*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['54.224.136.112', 'localhost']
+ALLOWED_HOSTS = ['54.224.136.112', 'localhost', '127.0.0.1']
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'  # ou outra backend de sua escolha
 
@@ -50,6 +50,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'ecommerce_catalog.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = "ecommerce_catalog.urls"
@@ -126,3 +127,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'login'
