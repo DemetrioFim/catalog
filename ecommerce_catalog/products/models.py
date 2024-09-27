@@ -44,7 +44,7 @@ class ItemCesta(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
     cesta = models.ForeignKey(Cesta, on_delete=models.CASCADE)
     quantidade = models.PositiveIntegerField(default=1)
-    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=False, blank=False)  # Novo campo
+    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Novo campo
 
     def __str__(self):
         return f'{self.quantidade}x {self.produto.nome}'
