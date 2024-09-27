@@ -56,7 +56,7 @@
                             {% for item in cesta.itemcesta_set.all %}
                                 <li>
                                     {{ item.quantidade }}x {{ item.produto.nome }} 
-                                    - R$ {{ item.produto.preco_venda }} cada
+                                    - R$ {{ item.preco_unitario }} cada
                                     - Total: R$ {{ item.preco_total }}
                                 </li>
                             {% endfor %}

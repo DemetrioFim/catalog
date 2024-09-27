@@ -148,7 +148,7 @@ def lista_cestas(request):
 
             for produto_id, quantidade in zip(lista_produtos, quantidades):
                 produto = Produto.objects.get(id=produto_id)
-                ItemCesta.objects.create(cesta=cesta, produto=produto, quantidade=quantidade)
+                ItemCesta.objects.create(cesta=cesta, produto=produto, quantidade=quantidade, preco_unitario=produto.preco_venda)
 
             return redirect('lista_cestas')
     else:

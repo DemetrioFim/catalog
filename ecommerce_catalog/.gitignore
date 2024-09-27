@@ -7,6 +7,7 @@ staticfiles/
 venv
 # SQLite database
 db.sqlite3
+ecommerce_catalog/db.sqlite3
 
 # Django migrations
 */migrations/
