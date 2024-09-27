@@ -18,8 +18,8 @@
                             <label for="produto_{{ forloop.counter0 }}">Produto</label>
                             <select name="produto_{{ forloop.counter0 }}" class="form-control produto-select">
                                 {% for produto in form.fields.produtos.queryset %}
-                                    <option value="{{ produto.id }}" data-preco="{{ produto.preco }}" {% if produto.id == item.produto.id %}selected{% endif %}>
-                                        {{ produto.nome }} - R$ {{ produto.preco }}
+                                    <option value="{{ produto.id }}" data-preco="{{ produto.preco_venda }}" {% if produto.id == item.produto.id %}selected{% endif %}>
+                                        {{ produto.nome }} - R$ {{ produto.preco_venda }}
                                     </option>
                                 {% endfor %}
                             </select>

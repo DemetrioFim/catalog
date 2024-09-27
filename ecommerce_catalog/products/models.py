@@ -10,7 +10,8 @@ class Categoria(models.Model):
 class Produto(models.Model):
     nome = models.CharField(max_length=255)
     descricao = models.TextField()
-    preco = models.DecimalField(max_digits=10, decimal_places=2)
+    preco_venda = models.DecimalField(max_digits=10, decimal_places=2)
+    preco_compra = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Novo campo
     imagem = models.ImageField(upload_to='produtos/', blank=True, null=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='produtos')
 
@@ -49,6 +50,6 @@ class ItemCesta(models.Model):
 
     @property
     def preco_total(self):
-        return self.quantidade * self.produto.preco
+        return self.quantidade * self.produto.preco_venda
 
 

@@ -294,25 +294,3 @@ def excluir_categoria(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
     categoria.delete()
     return redirect('lista_categorias')
-
-def atualizar_preco_produto(request, produto_id):
-    produto = get_object_or_404(Produto, id=produto_id)
-    if request.method == 'POST':
-        form = ProductPriceForm(request.POST)
-        if form.is_valid():
-            product_price = form.save(commit=False)
-            product_price.produto = produto
-            product_price.save()  # O sinal cuidará de atualizar o current_price e data_fim
-            return redirect('lista_produtos')
-    else:
-        form = ProductPriceForm()
-    
-    return render(request, 'products/atualizar_preco_produto.html', {
-        'form': form,
-        'produto': produto,
-    })
-
-
-def lista_produtos(request):
-    produtos = Produto.objects.all().select_related('categoria')
-    return render(request, 'products/lista_produtos.html', {'produtos': produtos})

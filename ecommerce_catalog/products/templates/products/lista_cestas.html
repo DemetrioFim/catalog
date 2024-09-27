@@ -56,7 +56,7 @@
                             {% for item in cesta.itemcesta_set.all %}
                                 <li>
                                     {{ item.quantidade }}x {{ item.produto.nome }} 
-                                    - R$ {{ item.produto.preco }} cada
+                                    - R$ {{ item.produto.preco_venda }} cada
                                     - Total: R$ {{ item.preco_total }}
                                 </li>
                             {% endfor %}
@@ -90,9 +90,9 @@
                                     <label for="produto_0">Produto</label>
                                     <select name="produto_0" class="form-control produto-select">
                                         {% for produto in form.fields.produtos.queryset %}
-                                            <option value="{{ produto.id }}" data-preco="{{ produto.preco|floatformat:2 }}">
+                                            <option value="{{ produto.id }}" data-preco="{{ produto.preco_venda|floatformat:2 }}">
 
-                                                {{ produto.nome }} - R$ {{ produto.preco }}
+                                                {{ produto.nome }} - R$ {{ produto.preco_venda }}
                                             </option>
                                         {% endfor %}
                                     </select>
@@ -102,7 +102,7 @@
                                     <input type="number" name="quantidade_0" min="1" value="1" class="form-control quantidade-input">
                                 </div>
                                 <div class="col-md-3">
-                                    <p class="mt-4 total-item">Total: R$ {{ produto.preco }}</p>
+                                    <p class="mt-4 total-item">Total: R$ {{ produto.preco_venda }}</p>
                                 </div>
                                 <div class="col-md-3 d-flex align-items-end">
                                     <button type="button" class="btn btn-danger remove-produto">Remover</button>

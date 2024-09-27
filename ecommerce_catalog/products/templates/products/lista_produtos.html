@@ -24,7 +24,10 @@
                                 <img src="URL_DA_IMAGEM_PADRAO" class="card-img-top" alt="Imagem não disponível">
                             {% endif %}
                             <div class="card-body">
-                                <h5 class="mb-1">{{ produto.nome }} - R$ {{ produto.preco }}</h5>
+                                <h4 class="mb-1">{{ produto.nome }}</h4>
+                                <p></p>
+                                <h5 class="mb-1">Valor de Compra - R$ {{ produto.preco_compra }} </h5>
+                                <h5 class="mb-1">Valor de Venda - R$ {{ produto.preco_venda }}</h5>
                                 <p class="card-text">{{ produto.descricao }}</p>
                                 <!-- Botões de editar e excluir -->
                                 <a href="{% url 'editar_produto' produto.id %}" class="btn btn-primary btn-sm">Editar</a>
