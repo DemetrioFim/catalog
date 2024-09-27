@@ -3,5 +3,20 @@ __pycache__/
 db.sqlite3
 media/
 staticfiles/
-.env
+*.env
 venv
+# SQLite database
+db.sqlite3
+
+# Django migrations
+*/migrations/
+
+# Static files
+/static/
+
+# Media files
+/media/
+
+# Environment variables
+*.env
+*.log
