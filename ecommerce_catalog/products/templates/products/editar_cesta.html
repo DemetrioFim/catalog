@@ -31,6 +31,10 @@
                         <div class="col-md-3">
                             <p class="mt-4 total-item">Total: R$ {{ item.preco_total }}</p>
                         </div>
+                        <div class="col-md-3">
+                            <label for="preco_unitario_{{ forloop.counter0 }}">Preço Unitário</label>
+                            <input type="number" name="preco_unitario_{{ forloop.counter0 }}" min="0" step="0.01" value="{{ item.preco_unitario }}" class="form-control preco-unitario-input">
+                        </div>                        
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="button" class="btn btn-danger remove-produto">Remover</button>
                         </div>
@@ -56,7 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let totalCesta = 0;
         produtoContainer.querySelectorAll('.produto-item').forEach(function(item) {
             const quantidade = item.querySelector('.quantidade-input').value;
-            const preco = item.querySelector('.produto-select option:checked').dataset.preco;
+            // const preco = item.querySelector('.produto-select option:checked').dataset.preco;
+            const preco = item.querySelector('.preco-unitario-input').value;
+
             const totalItem = quantidade * preco;
             item.querySelector('.total-item').innerText = `Total: R$ ${totalItem.toFixed(2)}`;
             totalCesta += parseFloat(totalItem);

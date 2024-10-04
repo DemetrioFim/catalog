@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Categoria(models.Model):
     nome = models.CharField(max_length=255)
@@ -44,7 +45,7 @@ class ItemCesta(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
     cesta = models.ForeignKey(Cesta, on_delete=models.CASCADE)
     quantidade = models.PositiveIntegerField(default=1)
-    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Novo campo
+    preco_unitario = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)  # Novo campo
 
     def __str__(self):
         return f'{self.quantidade}x {self.produto.nome}'
@@ -53,4 +54,13 @@ class ItemCesta(models.Model):
     def preco_total(self):
         return self.quantidade * self.preco_unitario  # Usando preco_unitario
 
+class HistoricoPreco(models.Model):
+    produto = models.ForeignKey(Produto, related_name='historico_precos', on_delete=models.CASCADE)
+    preco_venda_antigo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    preco_venda_novo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    preco_compra_antigo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    preco_compra_novo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    alterado_em = models.DateTimeField(default=timezone.now)
 
+    def __str__(self):
+        return f"{self.produto.nome} - Alterado em {self.alterado_em}"

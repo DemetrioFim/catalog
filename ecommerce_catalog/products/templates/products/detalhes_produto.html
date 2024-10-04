@@ -1,0 +1,57 @@
+<!-- detalhes_produto.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ produto.nome }}</h1>
+<p>Preço de Venda Atual: R$ {{ produto.preco_venda }}</p>
+<p>Preço de Compra Atual: R$ {{ produto.preco_compra }}</p>
+
+<h2>Histórico de Preços</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Data da Alteração</th>
+            <th>Preço de Venda Antigo</th>
+            <th>Preço de Venda Novo</th>
+            <th>Preço de Compra Antigo</th>
+            <th>Preço de Compra Novo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for historico in historicos %}
+        <tr>
+            <td>{{ historico.alterado_em }}</td>
+            <td>
+                {% if historico.preco_venda_antigo %}
+                    R$ {{ historico.preco_venda_antigo }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if historico.preco_venda_novo %}
+                    R$ {{ historico.preco_venda_novo }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if historico.preco_compra_antigo %}
+                    R$ {{ historico.preco_compra_antigo }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td>
+                {% if historico.preco_compra_novo %}
+                    R$ {{ historico.preco_compra_novo }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

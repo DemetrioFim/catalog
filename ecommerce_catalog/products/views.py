@@ -148,6 +148,8 @@ def lista_cestas(request):
 
             for produto_id, quantidade in zip(lista_produtos, quantidades):
                 produto = Produto.objects.get(id=produto_id)
+                print(produto)
+                print(produto.preco_venda)
                 ItemCesta.objects.create(cesta=cesta, produto=produto, quantidade=quantidade, preco_unitario=produto.preco_venda)
 
             return redirect('lista_cestas')
@@ -188,6 +190,7 @@ def editar_cesta(request, cesta_id=None):
                 print(f'Status salvo: {cesta.status}')  # Log para verificar o status salvo
 
             else:
+                print("A",cesta)
                 # Atualiza o status e cliente da cesta
                 cesta.cliente = cliente
                 cesta.status = status
@@ -198,20 +201,33 @@ def editar_cesta(request, cesta_id=None):
 
             # Adiciona os novos produtos à cesta
             n_produtos = len([item for item in request.POST.keys() if item.startswith('produto_')])
-            lista_produtos = []
-            quantidades = []
+            # lista_produtos = []
+            # quantidades = []
 
+            # for i in range(n_produtos):
+            #     produto = int(request.POST.get(f'produto_{i}', 1))
+            #     lista_produtos.append(produto)
+
+            # for i, produto_id in enumerate(lista_produtos):
+            #     quantidade = int(request.POST.get(f'quantidade_{i}', 1))
+            #     quantidades.append(quantidade)
+
+
+
+
+            # for produto_id, quantidade in zip(lista_produtos, quantidades):
+            #     produto = Produto.objects.get(id=produto_id)
+            #     # ItemCesta.objects.create(cesta=cesta, produto=produto, quantidade=quantidade)
+            #     ItemCesta.objects.create(cesta=cesta, produto=produto, quantidade=quantidade,preco_unitario=preco_unitario)
+
+
+            print(request.POST)
             for i in range(n_produtos):
-                produto = int(request.POST.get(f'produto_{i}', 1))
-                lista_produtos.append(produto)
-
-            for i, produto_id in enumerate(lista_produtos):
+                produto_id = int(request.POST.get(f'produto_{i}', 1))
                 quantidade = int(request.POST.get(f'quantidade_{i}', 1))
-                quantidades.append(quantidade)
-
-            for produto_id, quantidade in zip(lista_produtos, quantidades):
+                preco_unitario = float(request.POST.get(f'preco_unitario_{i}', 0))
                 produto = Produto.objects.get(id=produto_id)
-                ItemCesta.objects.create(cesta=cesta, produto=produto, quantidade=quantidade)
+                ItemCesta.objects.create(cesta=cesta, produto=produto, quantidade=quantidade,preco_unitario=preco_unitario)
 
             return redirect('lista_cestas')
     else:
@@ -294,3 +310,11 @@ def excluir_categoria(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
     categoria.delete()
     return redirect('lista_categorias')
+
+def detalhes_produto(request, produto_id):
+    produto = get_object_or_404(Produto, id=produto_id)
+    historicos = produto.historico_precos.all().order_by('-alterado_em')
+    return render(request, 'products/detalhes_produto.html', {
+        'produto': produto,
+        'historicos': historicos
+    })
